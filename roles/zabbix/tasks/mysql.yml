@@ -1,0 +1,33 @@
+- name: Remove anonymous user
+  mysql_user:
+    name: ''
+    host_all: true
+    state: absent
+- name: Set root password
+  mysql_user:
+    login_user: root
+    name: root
+    password: "{{ ZABBIX_MYSQL_ROOT_PASSWORD }}"
+    state: present
+  ignore_errors: true
+- name: Create zabbix database
+  mysql_db:
+    login_user: root
+    login_password: "{{ ZABBIX_MYSQL_ROOT_PASSWORD }}"
+    name: "{{ ZABBIX_SERVER_MYSQL_DATABASE }}"
+    collation: utf8_bin
+    encoding: utf8
+    state: present
+- name: Create zabbix user
+  mysql_user:
+    login_user: root
+    login_password: "{{ ZABBIX_MYSQL_ROOT_PASSWORD }}"
+    name: "{{ ZABBIX_SERVER_MYSQL_USER }}"
+    password: "{{ ZABBIX_SERVER_MYSQL_USER_PASSWORD }}"
+    priv: "{{ ZABBIX_SERVER_MYSQL_DATABASE }}.*:ALL"
+- name: Import initial schema
+  shell: |
+    zcat /usr/share/doc/zabbix-server-mysql/create.sql.gz | mysql -u"{{ ZABBIX_SERVER_MYSQL_USER }}" -p"{{ ZABBIX_SERVER_MYSQL_USER_PASSWORD }}" "{{ ZABBIX_SERVER_MYSQL_DATABASE }}"
+  ignore_errors: true
+  changed_when: true
+  run_once: true

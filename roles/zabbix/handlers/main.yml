@@ -1,0 +1,14 @@
+---
+# handlers file for zabbix
+- name: restart zabbix
+  service:
+    name: zabbix-server
+    state: restarted
+- name: restart apache
+  service:
+    name: apache2
+    state: restarted
+- name: restart agent
+  service:
+    name: zabbix-agent
+    state: restarted

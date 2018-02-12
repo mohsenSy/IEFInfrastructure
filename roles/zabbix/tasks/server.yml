@@ -1,0 +1,16 @@
+- include_tasks: "{{ ZABBIX_DB_TYPE }}.yml"
+- name: Copy zabbix configuration file
+  template:
+    src: zabbix_server.conf.j2
+    dest: /etc/zabbix/zabbix_server.conf
+  notify: restart zabbix
+- name: Copy zabbix frontend configuration file
+  template:
+    src: zabbix.conf.j2
+    dest: /etc/apache2/conf-enabled/zabbix.conf
+  notify: restart apache
+- name: Start zabbix server
+  service:
+    name: zabbix-server
+    state: started
+    enabled: true

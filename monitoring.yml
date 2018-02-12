@@ -1,0 +1,13 @@
+- hosts: zabbix_server
+  become: true
+  gather_facts: true
+
+  vars_files:
+    - secrets.yml
+  roles:
+    - role: zabbix
+      ZABBIX_TYPE: server
+      ZABBIX_FRONTEND:
+      ZABBIX_FRONTEND_TIMEZONE: Asia/Damascus
+    - role: zabbix
+      ZABBIX_TYPE: agent

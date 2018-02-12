@@ -1,0 +1,38 @@
+- name: Download zabbix packages
+  apt:
+    deb: "http://repo.zabbix.com/zabbix/{{ ZABBIX_SERVER_VERSION }}/ubuntu/pool/main/z/zabbix-release/zabbix-release_{{ ZABBIX_SERVER_VERSION }}-1+{{ ansible_lsb.codename }}_all.deb"
+    state: present
+- name: Install zabbix
+  apt:
+    name: "zabbix-{{ ZABBIX_TYPE }}-{{ ZABBIX_DB_TYPE }}"
+    state: present
+    update_cache: true
+  when: ZABBIX_TYPE is defined and ZABBIX_TYPE != "agent"
+- name: Install zabbix agent if required
+  apt:
+    name: zabbix-agent
+    state: present
+    update_cache: true
+  when: ZABBIX_TYPE == "agent"
+- name: Install php frontend
+  apt:
+    name: zabbix-frontend-php
+    state: present
+  when: ZABBIX_FRONTEND is defined
+- name: Install some python dependencies
+  apt:
+    name: "{{ item }}"
+    state: present
+    cache_valid_time: 86400
+  with_items:
+    - python-virtualenv
+    - python-pip
+    - python-dev
+    - libmysqlclient-dev
+- name: install MySQL-python and zabbix-api modules
+  pip:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - MySQL-python
+    - zabbix-api
